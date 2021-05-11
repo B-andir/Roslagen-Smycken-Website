@@ -1,0 +1,9 @@
+nav img {
+    width: 8%;
+    height: 8%;
+    border-radius: 90%/95%;
+}
+
+nav li {
+    display: inline-block;
+}
