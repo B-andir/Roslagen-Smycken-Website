@@ -2,16 +2,19 @@ const express = require('express');
 const session = require('express-session');
 const morgan = require('morgan');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const multer = require('multer');
 const MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const createDOMPurify = require('dompurify');
 const { Console } = require('console');
 const { JSDOM } = require('jsdom');
+const { v4 : uuidv4 } = require('uuid');
 
 const windowEmulator = new JSDOM('').window;
 const DOMPurify = createDOMPurify(windowEmulator);
@@ -27,11 +30,15 @@ if (DOMPurify.isSupported){
     console.log("DOMPurify is supported!");
 }
 
+// Used to authenticate login cookies
+process.env.LOGIN_COOKIE = uuidv4();
+
 // express app
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(session({
     secret: JWT_SECRET,
     resave: false,
@@ -56,57 +63,168 @@ app.use(express.static('public'))
 // console logger
 app.use(morgan('dev'));
 
+const userModel = mongoose.model('User', new mongoose.Schema({ username: String, password: String, loginCookie: String, isAdmin: false }), 'users');
+
+async function ReadLoginCookie(cookies, res, _callback) {
+    const cookie = cookies.RoslagenSmyckenLoginCookie;
+
+    let response = {
+        isLoggedIn: false,
+        username: null
+    };
+
+    if (cookie === undefined){
+        _callback(response);
+    } else {
+        var decoded = jwt.verify(cookie, JWT_SECRET);
+
+        try {
+            userModel.findOne({ username: decoded.username }, function(err, user){
+    
+                if (user.loginCookie === decoded.privateKey){
+    
+                    response.isLoggedIn = true;
+                    response.username = decoded.username;
+    
+                    // console.log(response);
+    
+                    _callback(response);
+    
+                } else {
+    
+                    console.warn("An unvalid private login key was attempted to pass for user " + decoded.username);
+    
+                    res.cookie('RoslagenSmyckenLoginCookie', null, { maxAge: 0, httpOnly: false })  // Delete fake cookie
+    
+                    _callback(response);
+                }
+            });
+        } catch(err) {
+            console.log(err)
+
+            res.cookie('RoslagenSmyckenLoginCookie', null, { maxAge: 0, httpOnly: false })  // Delete fake cookie
+
+            _callback(response);
+        }
+    }
+}
+
+function GenerateLoginCookie(user) {
+    user.loginCookie = uuidv4();
+    user.save();
+    console.log("Created private login token")
+
+    var token = jwt.sign({ username: user.username, privateKey: user.loginCookie, isAdmin: user.isAdmin }, JWT_SECRET);
+    
+    return(token);
+}
 
 // Register POST request
 app.post('/api/register', (req, res) => {
     const username = req.body.username;
     const rawPassword = req.body.password;
 
-    bcrypt.hash(rawPassword, saltRounds, function(err, hash) {
+    try {
+        var user = userModel.findOne({ username: username })
 
-        const userModel = mongoose.model('User', new mongoose.Schema({ username: String, password: String }), 'users');
+        if (user != null) {
+            res.redirect('/register?error=usernameTaken');
+        }
+    } catch {
+        bcrypt.hash(rawPassword, saltRounds, function(err, hash) {
+
+            userModel.create({ username: username, password: hash }, function(err, user) {
+                if (err) throw err;
+
+            })
+        });
+    }
+    
+    console.log("Registered a new user");
+
+    res
+        .cookie('RoslagenSmyckenLoginCookie', GenerateLoginCookie(user), { maxAge: 172800000, httpOnly: false })  // maxAge = 2 days
+        .redirect('/');
+
+});
+
+// Login POST request
+app.post('/api/login', (req, res) => {
+    const username = req.body.username;
+    const rawPassword = req.body.password;
+
+    userModel.findOne({ username: username }, function(err, user) {
+        if (err) return err;
+
+        if (user != null) {
+            bcrypt.compare(rawPassword, user.password, function(err, result) {
+                if (err) console.error(err);
         
-        userModel.create({ username: username, password: hash }, function(err, user) {
-            if (err) throw err;
+                if (!result){
+                    res.redirect('/login?error=wrongPassword')
+                }
+                else {
 
-        })
+                    console.log("User logged in");
+
+                    res
+                        .cookie('RoslagenSmyckenLoginCookie', GenerateLoginCookie(user), { maxAge: 172800000, httpOnly: false})  // maxAge = 2 days
+                        .redirect('/');
+                
+                }
+            });
+        } else {
+            res.redirect('/login?error=wrongUsername')
+        }
     });
 
-
-
-    res.redirect('/');
 });
 
 
 // requests for pages
 
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home' });
+    ReadLoginCookie(req.cookies, res, userInfo => {
+        console.log(userInfo);
+        res.render('index', { title: 'Home', userInfo, error: req.query.error });
+    });
 });
 
 app.get('/about', (req, res) => {
-    res.render('about', { title: 'About Us' });
+    ReadLoginCookie(req.cookies, res, userInfo => {
+        console.log(userInfo);
+        res.render('about', { title: 'About Us', userInfo });
+    });
 });
 
 app.get('/contact', (req, res) => {
-    res.render('contact', { title: 'Contact' });
-});
-
-app.get('/login', (req, res) => {
-    res.render('login', { title: 'Login' });
-});
-
-app.get('/register', (req, res) => {
-    res.render('register', { title: 'Register' });
+    ReadLoginCookie(req.cookies, res, userInfo => {
+        console.log(userInfo);
+        res.render('contact', { title: 'Contact', userInfo });
+    });
 });
 
 app.get('/order', (req, res) => {
-    res.render('order', { title: 'Order' });
+    ReadLoginCookie(req.cookies, res, userInfo => {
+        console.log(userInfo);
+        res.render('order', { title: 'Order', userInfo });
+    });
 });
 
 app.get('/order/build', (req, res) => {
-    console.log(req.query)
-    res.render('buildOrderTemplate', { title: 'Build Order Template', kind: req.query.kind });
+    ReadLoginCookie(req.cookies, res, userInfo => {
+        console.log(userInfo);
+        res.render('buildOrderTemplate', { title: 'Build Order Template', userInfo, kind: req.query.kind });
+    });
+});
+
+
+app.get('/login', (req, res) => {
+    res.render('login', { title: 'Login', error: req.query.error });
+});
+
+app.get('/register', (req, res) => {
+    res.render('register', { title: 'Register', error: req.query.error });
 });
 
 
