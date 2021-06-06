@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+    <%- include('./partials/head.ejs') %>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <div id="drop-area">
+        <form method="post" enctype="multipart/form-data" action="/order/build/upload" class="my-form">
+            <label for="patternselect">Select Pattern</label>
+            <select name="pattern" id="patternselect">
+                <% if (kind === "bracelet") { %> 
+                <option value="byzantine">Byzantine</option>
+                <option value="full-persian">Full-Persian</option>
+                <% } %>
+            </select>
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="Information | 0.8mm wire... :" name="title" required>
+            <label for="body">Body</label>
+            <input type="text" id="body" placeholder="Description | Loose chain... :" name="body" required>
+            <label for="estimatePrice">Estimate Price</label>
+            <input type="text" id="estimatePrice" placeholder="Price per cm (kr)" name="price" required>
+            <label for="image">Product image</label>
+            <input type="file" id="image" name="image" required>
+            <input type="hidden" value="<%= kind %>">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    
+    <%- include('./partials/footer.ejs') %>
+</body>
+</html>

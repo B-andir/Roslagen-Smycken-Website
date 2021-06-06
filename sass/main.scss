@@ -1,0 +1,14 @@
+@use 'colors';
+
+body {
+    position: relative;
+    background-color: colors.$whiteish;
+    margin: 0;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+main {padding-bottom: 40px;}

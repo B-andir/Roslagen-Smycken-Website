@@ -1,0 +1,18 @@
+<html lang="en">
+<head>
+    <%- include('./partials/head.ejs') %>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+    
+    <div id="drop-area">
+        <form method="post" action="/api/register" class="my-form">
+            <input type="text" name="username" id="username" placeholder="Username: ..." required><br>
+            <input type="password" name="password" id="password" placeholder="Password: ..." required><br>
+            <input type="submit" value="Register">
+        </form>
+    </div>
+
+    <%- include('./partials/footer.ejs') %>
+</body>
+</html>

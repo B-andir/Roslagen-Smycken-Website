@@ -1,0 +1,83 @@
+main {
+  /* Next & previous buttons */
+  /* Position the "next button" to the right */
+  /* The dots/bullets/indicators */
+  /* Fading animation */
+}
+main #slide {
+  width: 96%;
+}
+main .mySlides {
+  display: none;
+}
+main .slideshow-container {
+  z-index: 1;
+  margin: auto;
+  width: 98%;
+  margin-top: 40px;
+  margin-bottom: -10px;
+}
+main .slideshow-container img {
+  border-radius: 6px;
+  width: 100%;
+}
+main .prev, main .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 15px;
+  margin-top: -22px;
+  color: #fffff8;
+  font-weight: bold;
+  font-size: 19px;
+  transition: 2.6s ease;
+  border-radius: 0 5px 5px 0;
+}
+main .next {
+  right: 0;
+  border-radius: 5px 0 0 5px;
+  margin-right: 1%;
+}
+main .prev:hover, main .next:hover {
+  background-color: #444444bb;
+}
+main .dot {
+  z-index: 2;
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  margin: 0 2px 40px 2px;
+  background-color: #c0c0c0;
+  border-radius: 50%;
+  border: 1px solid #979797;
+  display: inline-block;
+  transition: background-color 2.6s ease;
+}
+main .active, main .dot:hover {
+  background-color: #979797;
+}
+main .fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.2s;
+  animation-name: fade;
+  animation-duration: 1.2s;
+}
+@-webkit-keyframes fade {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*# sourceMappingURL=slideshow.css.map */
