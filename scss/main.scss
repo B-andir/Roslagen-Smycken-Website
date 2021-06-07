@@ -1,0 +1,14 @@
+@import 'colors', 'fonts', 'footer', 'nav', 'slideshow';
+
+body {
+    position: relative;
+    background-color: $whiteish;
+    margin: 0;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+main {padding-bottom: 40px;}

@@ -4,8 +4,12 @@
 </head>
 <body>
     <%- include('./partials/nav.ejs') %>
+
+    <% if (wrongUsername) { %>
+        <h2>Wrong Username</h2>
+    <% } %>
     
-    <form action="/api/login" method="POST">
+    <form method="POST" action="/account/login">
         <input type="text" name="username" id="username" placeholder="Username: ..." required><br>
         <input type="password" name="password" id="password" placeholder="Password: ..." required><br>
         <input type="submit" value="Login">

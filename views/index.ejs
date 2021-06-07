@@ -1,17 +1,15 @@
 <html lang="en">
 <head>
     <%- include('./partials/head.ejs') %>
-    <link rel="stylesheet" href="/styles/slideshow.css">
 </head>
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <% try { var loggedIn = loggedIn %>
-    <% } catch { var loggedIn = false } %>
-
     <main>
-        <% if (loggedIn) { %>
+        <% if (username != undefined) { %>
             <h2>Logged In!</h2>
+        <% } else { %>
+            <h2>No Username</h2>
         <% } %>
         <div class="slideshow-container">
             <div class="mySlides fade"><img src="images/640x360.png" style="width:100%"></div>
