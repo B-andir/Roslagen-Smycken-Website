@@ -1,8 +1,8 @@
-@use 'colors';
+@import 'colors', 'fonts', 'footer', 'nav', 'slideshow';
 
 body {
     position: relative;
-    background-color: colors.$whiteish;
+    background-color: $whiteish;
     margin: 0;
 }
 
@@ -11,4 +11,4 @@ ul {
     padding-left: 0;
 }
 
-main {padding-bottom: 40px;}
+main {padding-bottom: 40px;} 
