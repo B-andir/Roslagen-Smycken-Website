@@ -13,8 +13,6 @@ const { v4 : uuidv4 } = require('uuid');
 const windowEmulator = new JSDOM('').window;
 const DOMPurify = createDOMPurify(windowEmulator);
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const DBUSERS_CONN = process.env.DBUSERS_CONN;
 const PORT = process.env.PORT != null ? process.env.PORT : 5000;
 
 if (DOMPurify.isSupported){
@@ -31,7 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
-    secret: JWT_SECRET,
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: false
 }));

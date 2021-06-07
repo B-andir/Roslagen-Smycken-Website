@@ -53,16 +53,18 @@ router.post('/order/build/upload', upload.single("image"), (req, res) => {
 
     var pathExtname = path.extname(req.file.originalname).toLowerCase()
     if (pathExtname === ".png" || pathExtname === ".jpg") {
+        
         fs.rename(tempPath, targetPath, err => {
+
         if (err) return handleError(err, res);
 
         res
             .status(200)
             .contentType("text/plain")
             .end("File uploaded!");
-
         });
     } else {
+
         fs.unlink(tempPath, err => {
         if (err) return handleError(err, res);
 
@@ -70,7 +72,6 @@ router.post('/order/build/upload', upload.single("image"), (req, res) => {
             .status(403)
             .contentType("text/plain")
             .end("Only .png and .jpg files are allowed!");
-
         });
     }
 });
