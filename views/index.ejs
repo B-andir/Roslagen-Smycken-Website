@@ -6,11 +6,13 @@
     <%- include('./partials/nav.ejs') %>
 
     <main>
-        <% if (username != undefined) { %>
+        <% if (user.username != undefined) { %>
             <h2>Logged In!</h2>
-        <% } else { %>
-            <h2>No Username</h2>
+            <h3><%- user.username %> </h3>
         <% } %>
+        <% if (user.isAdmin) { %> 
+            <h3>Admin</h3>
+        <% } %> 
         <div class="slideshow-container">
             <div class="mySlides fade"><img src="images/640x360.png" style="width:100%"></div>
             <div class="mySlides fade"><img src="images/640x360-2.png" style="width:100%"></div>

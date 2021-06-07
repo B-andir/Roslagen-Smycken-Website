@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const fs = require('fs');
+const bodyParser = require('body-parser');
 
 const upload = multer({ dest: "uploads/" });
 
@@ -8,8 +10,7 @@ const upload = multer({ dest: "uploads/" });
 // requests for pages
 
 router.get('/', (req, res) => {
-    console.log(res.locals)
-    res.render('index', { title: 'Home', username: res.locals.username });
+    res.render('index', { title: 'Home' });
 });
 
 router.get('/about', (req, res) => {
@@ -28,10 +29,8 @@ router.get('/order/build', (req, res) => {
         res.render('buildOrderTemplate', { title: 'Build Order Template', userInfo, kind: req.query.kind });
 });
 
-
 router.get('/login', (req, res) => {
-    console.log(req.url);
-    res.render('login', { title: 'Login', wrongUsername: false, wrongPassword: false });
+    res.render('login', { title: 'Login', error: req.query.error });
 });
 
 router.get('/register', (req, res) => {

@@ -13,9 +13,12 @@ mongoose.connect(process.env.DBUSERS_CONN, {useNewUrlParse: true, useUnifiedTopo
 
 
 router.use(async (req, res, next) => {
-    const cookie = req.cookies.RoslagenSmyckenLoginCookie;
+    const cookie = req.cookies.LOGIN_TOKEN;
 
-    res.locals.username =  undefined;
+    res.locals.user = {
+        username: undefined,
+        isAdmin: false
+    };
 
     if (cookie != undefined) {
          await jwt.verify(cookie, process.env.JWT_SECRET, (err, decoded) => {
@@ -23,33 +26,36 @@ router.use(async (req, res, next) => {
 
             userModel.findOne({ username: decoded.username }, async function (err, user) {
 
-                console.log(user.username);
                 if (err) {
                     
-                    // res.cookie('RoslagenSmyckenLoginCookie', null, { maxAge: 0, httpOnly: false })  // Delete fake cookie
+                    res.cookie('LOGIN_TOKEN', null, { maxAge: 0 })  // Delete fake cookie
 
                     return err;
                 }
 
                 else if (user.loginCookie === decoded.privateKey){
 
-                    res.locals.username = decoded.username
+                    res.locals.user = {
+                        username: decoded.username,
+                        isAdmin: decoded.isAdmin
+                    };
+                        
 
                     await next();
     
                 } else {
-    
+
                     console.warn("An unvalid private login key was attempted to pass for user " + decoded.username);
     
-                    // res.cookie('RoslagenSmyckenLoginCookie', null, { maxAge: 0, httpOnly: false })  // Delete fake cookie
+                    res.cookie('LOGIN_TOKEN', null, { maxAge: 0 })  // Delete fake cookie
 
+                    await next();                    
                 }
             });
         });
     } else {
 
         next();
-        
     }
 
 });
