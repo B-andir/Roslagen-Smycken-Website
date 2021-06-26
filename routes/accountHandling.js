@@ -11,7 +11,7 @@ const { v4 : uuidv4 } = require('uuid');
 const userModel = require('../models/user');
 const { localsName } = require('ejs');
 
-mongoose.connect(process.env.DBUSERS_CONN, {useNewUrlParse: true, useUnifiedTopology: true});
+mongoose.connect(process.env.DBUSERS_CONN_URL, {useNewUrlParse: true, useUnifiedTopology: true});
 
 const saltRounds = 12;
 

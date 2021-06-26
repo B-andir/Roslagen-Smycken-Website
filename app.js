@@ -1,8 +1,6 @@
 const express = require('express');
 const session = require('express-session');
 const morgan = require('morgan');
-const path = require('path');
-const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv').config();
 const createDOMPurify = require('dompurify');
@@ -34,15 +32,6 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// connect to mongodb
-// mongoose.connect(DBUSERS_CONN, {useNewUrlParse: true, useUnifiedTopology: true});
-
-// const dbUsers = mongoose.connections[0];
-// dbUsers.on('error', console.error.bind(console, 'connection error:'));
-// dbUsers.once('open', function() {
-//     // Something goes here
-// });
-
 // register view engine
 app.set('view engine', 'ejs');
 
@@ -52,6 +41,7 @@ app.use(express.static('public'))
 // console logger
 app.use(morgan('dev'));
 
+
 // API calls for account handling
 app.use('/api', require('./routes/accountHandling.js'));
 
@@ -60,6 +50,7 @@ app.use('/', require('./middleware/checkCookie.js'));
 
 // route to requested page
 app.use('/', require('./routes/routing.js'));
+
 
 // run webserver
 app.listen(PORT, () => {
